@@ -31,7 +31,8 @@ public class CommandParameterCompletionContributor extends CompletionContributor
                 @NotNull CompletionParameters parameters,
                 @NotNull ProcessingContext context,
                 @NotNull CompletionResultSet result) {
-            var completionLoader = parameters.getOriginalFile().getProject().getService(CommandParameterCompletionLoader.class);
+            var completionLoader =
+                    parameters.getOriginalFile().getProject().getService(CommandParameterCompletionLoader.class);
             var module = ModuleUtilCore.findModuleForFile(parameters.getOriginalFile());
             if (module == null) {
                 // We cannot suggest parameters if we don't know the module (and therefore the SDK)

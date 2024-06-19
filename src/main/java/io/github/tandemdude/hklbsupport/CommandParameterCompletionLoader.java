@@ -9,14 +9,13 @@ import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.Project;
 import com.jetbrains.python.sdk.PythonSdkUtil;
+import io.github.tandemdude.hklbsupport.utils.Notifier;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
-
-import io.github.tandemdude.hklbsupport.utils.Notifier;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
