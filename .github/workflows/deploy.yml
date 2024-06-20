@@ -16,7 +16,6 @@ on:
         description: "Whether to increment the version before release."
         type: boolean
         default: true
-  push:
 
 jobs:
   deploy:
@@ -26,9 +25,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
-      - name: Exit
-        run: exit 1
 
       - name: Setup Python
         uses: actions/setup-python@v5
