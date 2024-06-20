@@ -17,6 +17,10 @@ on:
         type: boolean
         default: true
 
+permissions:
+  contents: write
+  actions: write
+
 jobs:
   deploy:
     name: Deploy
