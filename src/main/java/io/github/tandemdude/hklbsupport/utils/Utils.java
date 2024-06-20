@@ -1,8 +1,15 @@
 package io.github.tandemdude.hklbsupport.utils;
 
+import com.intellij.openapi.module.ModuleUtilCore;
+import com.intellij.openapi.util.Pair;
 import com.jetbrains.python.psi.PyClass;
+import com.jetbrains.python.psi.PyExpression;
+import com.jetbrains.python.psi.PyKeywordArgument;
 import com.jetbrains.python.psi.types.TypeEvalContext;
 import io.github.tandemdude.hklbsupport.CommandParameterCompletionLoader;
+import java.util.Arrays;
+import java.util.Map;
+import java.util.stream.Collectors;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -32,5 +39,30 @@ public class Utils {
             }
         }
         return commandSuperClass;
+    }
+
+    public static @Nullable CommandParameterCompletionLoader.LightbulbData getLightbulbDataForNode(
+            @NotNull PyClass node) {
+        var module = ModuleUtilCore.findModuleForFile(node.getContainingFile());
+        if (module == null) {
+            return null;
+        }
+
+        var service = module.getProject().getService(CommandParameterCompletionLoader.class);
+        if (service == null) {
+            return null;
+        }
+
+        return service.getLightbulbData(module);
+    }
+
+    public static Map<String, PyExpression> getKeywordSuperclassExpressions(PyClass node) {
+        return Arrays.stream(node.getSuperClassExpressions())
+                .filter(expr -> expr instanceof PyKeywordArgument)
+                // I had a null pointer exception from this previously so probably good to just make sure
+                .filter(expr -> expr.getName() != null)
+                .map(expr -> Pair.create(
+                        ((PyKeywordArgument) expr).getKeyword(), ((PyKeywordArgument) expr).getValueExpression()))
+                .collect(Collectors.toMap(p -> p.getFirst(), p -> p.getSecond()));
     }
 }
