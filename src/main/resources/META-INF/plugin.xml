@@ -33,17 +33,27 @@
     <!-- Extension points defined by the plugin.
          Read more: https://plugins.jetbrains.com/docs/intellij/plugin-extension-points.html -->
     <extensions defaultExtensionNs="com.intellij">
+        <postStartupActivity implementation="io.github.tandemdude.hklbsupport.StartupActivity"/>
+        <notificationGroup displayType="BALLOON" id="Hikari Lightbulb Support"/>
+
         <completion.contributor
             implementationClass="io.github.tandemdude.hklbsupport.CommandParameterCompletionContributor"
             language="Python"
         />
-        <postStartupActivity implementation="io.github.tandemdude.hklbsupport.StartupActivity"/>
-        <notificationGroup displayType="BALLOON" id="Hikari Lightbulb Support"/>
+
         <localInspection
-                implementationClass="io.github.tandemdude.hklbsupport.CommandParameterInspector"
-                language="Python"
-                displayName="Command parameters missing or incorrect type"
-                enabledByDefault="true"
+            implementationClass="io.github.tandemdude.hklbsupport.CommandRequiredParametersInspector"
+            language="Python"
+            displayName="Command missing required parameters"
+            enabledByDefault="true"
+            groupName="Hikari lightbulb"
+        />
+        <localInspection
+            implementationClass="io.github.tandemdude.hklbsupport.CommandParameterTypeInspector"
+            language="Python"
+            displayName="Command parameters having incorrect type"
+            enabledByDefault="true"
+            groupName="Hikari lightbulb"
         />
     </extensions>
 </idea-plugin>
