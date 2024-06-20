@@ -14,7 +14,15 @@
          Simple HTML elements (text formatting, paragraphs, and lists) can be added inside of <![CDATA[ ]]> tag.
          Guidelines: https://plugins.jetbrains.com/docs/marketplace/plugin-overview-page.html#plugin-description -->
     <description><![CDATA[
-        Hikari Lightbulb metaclass parameter autocompletion support
+        Adds quality of life features to assist development using the hikari-lightbulb Python library.
+        <br><br>
+        Features:
+        <ul>
+            <li>Autocompletion of command named parameters</li>
+            <li>Type checking of command named parameters</li>
+        </ul>
+        <br>
+        Supports hikari-lightbulb major version 3 and later.
   ]]></description>
 
     <!-- Product and plugin compatibility requirements.

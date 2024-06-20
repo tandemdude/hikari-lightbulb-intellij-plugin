@@ -6,6 +6,7 @@ import com.intellij.codeInspection.ProblemsHolder;
 import com.intellij.openapi.module.ModuleUtilCore;
 import com.intellij.openapi.util.Pair;
 import com.intellij.psi.PsiElementVisitor;
+import com.jetbrains.python.documentation.PythonDocumentationProvider;
 import com.jetbrains.python.inspections.PyInspection;
 import com.jetbrains.python.inspections.PyInspectionVisitor;
 import com.jetbrains.python.psi.PyClass;
@@ -53,20 +54,12 @@ public class CommandParameterInspector extends PyInspection {
                 return;
             }
 
-            var expectedStr = expected.getName();
-            if (expected instanceof PyCollectionType pct) {
-                var elements =
-                        pct.getElementTypes().stream().filter(Objects::nonNull).toList();
-
-                if (!elements.isEmpty()) {
-                    var joinElems = elements.stream().map(PyType::getName).collect(Collectors.joining(", "));
-                    expectedStr = expectedStr + "[" + joinElems + "]";
-                }
-            }
+            var expectedName = PythonDocumentationProvider.getTypeName(expected, myTypeEvalContext);
+            var actualName = PythonDocumentationProvider.getTypeName(actual, myTypeEvalContext);
 
             registerProblem(
                     at,
-                    "Expected type '" + expectedStr + "', got '" + actual.getName() + "' instead",
+                    "Expected type '" + expectedName + "', got '" + actualName + "' instead",
                     ProblemHighlightType.WARNING);
         }
 
