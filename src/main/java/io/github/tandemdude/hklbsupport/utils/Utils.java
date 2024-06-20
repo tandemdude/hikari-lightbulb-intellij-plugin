@@ -6,12 +6,11 @@ import com.jetbrains.python.psi.PyClass;
 import com.jetbrains.python.psi.PyExpression;
 import com.jetbrains.python.psi.PyKeywordArgument;
 import com.jetbrains.python.psi.types.TypeEvalContext;
+import com.jetbrains.python.sdk.PythonSdkUtil;
+import io.github.tandemdude.hklbsupport.LightbulbPackageManagerListener;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.stream.Collectors;
-
-import com.jetbrains.python.sdk.PythonSdkUtil;
-import io.github.tandemdude.hklbsupport.LightbulbPackageManagerListener;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -64,8 +63,7 @@ public class Utils {
                 .map(expr -> (PyKeywordArgument) expr)
                 // I had a null pointer exception from this previously so probably good to just make sure
                 .filter(expr -> expr.getKeyword() != null && expr.getValueExpression() != null)
-                .map(expr -> Pair.create(
-                        expr.getKeyword(), expr.getValueExpression()))
+                .map(expr -> Pair.create(expr.getKeyword(), expr.getValueExpression()))
                 .collect(Collectors.toMap(p -> p.getFirst(), p -> p.getSecond()));
     }
 }

@@ -13,18 +13,18 @@ import com.intellij.psi.search.GlobalSearchScope;
 import com.jetbrains.python.packaging.PyPackageManager;
 import com.jetbrains.python.sdk.PythonSdkUtil;
 import io.github.tandemdude.hklbsupport.utils.Notifier;
-import org.jetbrains.annotations.NotNull;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import org.jetbrains.annotations.NotNull;
 
 public class LightbulbPackageManagerListener implements PyPackageManager.Listener {
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
     public record ParamData(Map<String, String> required, Map<String, String> optional) {}
+
     public record LightbulbData(String version, Map<String, ParamData> paramData) {}
 
     private static final ConcurrentHashMap<Sdk, LightbulbData> sdkLightbulbData = new ConcurrentHashMap<>();
@@ -35,8 +35,7 @@ public class LightbulbPackageManagerListener implements PyPackageManager.Listene
 
     LightbulbData readMetaparamsFile(String version, VirtualFile vf) {
         try {
-            var parsedParamData =
-                    MAPPER.readValue(vf.getInputStream(), new TypeReference<Map<String, ParamData>>() {});
+            var parsedParamData = MAPPER.readValue(vf.getInputStream(), new TypeReference<Map<String, ParamData>>() {});
             return new LightbulbData(version, parsedParamData);
         } catch (IOException e) {
             return null;
@@ -60,7 +59,8 @@ public class LightbulbPackageManagerListener implements PyPackageManager.Listene
             }
 
             var existingData = sdkLightbulbData.get(sdk);
-            if (existingData != null && existingData.version().equals(lightbulb.get().getVersion())) {
+            if (existingData != null
+                    && existingData.version().equals(lightbulb.get().getVersion())) {
                 // The cache is still up-to-date - do not refresh
                 return;
             }
@@ -80,23 +80,25 @@ public class LightbulbPackageManagerListener implements PyPackageManager.Listene
                 });
             }
 
-            FileTypeIndex.processFiles(FileTypeManager.getInstance().getFileTypeByExtension("json"), file -> {
-                if (
-                    file.getPath().endsWith("metaparams.json")
-                    && file.getPath().contains("lightbulb")
-                    && file.getPath().contains(lightbulbLocation)
-                ) {
-                    var data = readMetaparamsFile(lightbulb.get().getVersion(), file);
-                    if (data == null) {
-                        return false;
-                    }
+            FileTypeIndex.processFiles(
+                    FileTypeManager.getInstance().getFileTypeByExtension("json"),
+                    file -> {
+                        if (file.getPath().endsWith("metaparams.json")
+                                && file.getPath().contains("lightbulb")
+                                && file.getPath().contains(lightbulbLocation)) {
+                            var data = readMetaparamsFile(lightbulb.get().getVersion(), file);
+                            if (data == null) {
+                                return false;
+                            }
 
-                    sdkLightbulbData.put(sdk, data);
-                    Notifier.notifyInformation(null, "Lightbulb configuration loaded successfully (%s)", sdk.getName());
-                    return false;
-                }
-                return true;
-            }, GlobalSearchScope.union(searchScopes));
+                            sdkLightbulbData.put(sdk, data);
+                            Notifier.notifyInformation(
+                                    null, "Lightbulb configuration loaded successfully (%s)", sdk.getName());
+                            return false;
+                        }
+                        return true;
+                    },
+                    GlobalSearchScope.union(searchScopes));
         });
     }
 }
