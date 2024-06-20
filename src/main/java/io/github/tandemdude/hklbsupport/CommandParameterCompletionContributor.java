@@ -17,6 +17,7 @@ import com.jetbrains.python.psi.PyArgumentList;
 import com.jetbrains.python.psi.PyClass;
 import com.jetbrains.python.psi.PyReferenceExpression;
 import com.jetbrains.python.psi.types.TypeEvalContext;
+import com.jetbrains.python.sdk.PythonSdkUtil;
 import io.github.tandemdude.hklbsupport.utils.Utils;
 import java.util.ArrayList;
 import org.jetbrains.annotations.NotNull;
@@ -31,8 +32,6 @@ public class CommandParameterCompletionContributor extends CompletionContributor
                 @NotNull CompletionParameters parameters,
                 @NotNull ProcessingContext context,
                 @NotNull CompletionResultSet result) {
-            var completionLoader =
-                    parameters.getOriginalFile().getProject().getService(CommandParameterCompletionLoader.class);
             var module = ModuleUtilCore.findModuleForFile(parameters.getOriginalFile());
             if (module == null) {
                 // We cannot suggest parameters if we don't know the module (and therefore the SDK)
@@ -40,7 +39,12 @@ public class CommandParameterCompletionContributor extends CompletionContributor
                 return;
             }
 
-            var moduleLightbulbData = completionLoader.getLightbulbData(module);
+            var sdk = PythonSdkUtil.findPythonSdk(module);
+            if (sdk == null) {
+                return;
+            }
+
+            var moduleLightbulbData = LightbulbPackageManagerListener.getSdkLightbulbData().get(sdk);
             if (moduleLightbulbData == null) {
                 // We don't have the data for the specified module - maybe it isn't part of this project?
                 // Alternatively, lightbulb may not be installed - a filesystem listener will load the

@@ -6,10 +6,12 @@ import com.jetbrains.python.psi.PyClass;
 import com.jetbrains.python.psi.PyExpression;
 import com.jetbrains.python.psi.PyKeywordArgument;
 import com.jetbrains.python.psi.types.TypeEvalContext;
-import io.github.tandemdude.hklbsupport.CommandParameterCompletionLoader;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import com.jetbrains.python.sdk.PythonSdkUtil;
+import io.github.tandemdude.hklbsupport.LightbulbPackageManagerListener;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -30,7 +32,7 @@ public class Utils {
     public static @Nullable PyClass getLightbulbSuperclass(
             @NotNull TypeEvalContext context,
             @NotNull PyClass pyClass,
-            @NotNull CommandParameterCompletionLoader.LightbulbData moduleData) {
+            @NotNull LightbulbPackageManagerListener.LightbulbData moduleData) {
         PyClass commandSuperClass = null;
         for (var superClass : pyClass.getSuperClasses(context)) {
             if (moduleData.paramData().containsKey(superClass.getQualifiedName())) {
@@ -41,28 +43,29 @@ public class Utils {
         return commandSuperClass;
     }
 
-    public static @Nullable CommandParameterCompletionLoader.LightbulbData getLightbulbDataForNode(
+    public static @Nullable LightbulbPackageManagerListener.LightbulbData getLightbulbDataForNode(
             @NotNull PyClass node) {
         var module = ModuleUtilCore.findModuleForFile(node.getContainingFile());
         if (module == null) {
             return null;
         }
 
-        var service = module.getProject().getService(CommandParameterCompletionLoader.class);
-        if (service == null) {
+        var sdk = PythonSdkUtil.findPythonSdk(module);
+        if (sdk == null) {
             return null;
         }
 
-        return service.getLightbulbData(module);
+        return LightbulbPackageManagerListener.getSdkLightbulbData().get(sdk);
     }
 
     public static Map<String, PyExpression> getKeywordSuperclassExpressions(PyClass node) {
         return Arrays.stream(node.getSuperClassExpressions())
                 .filter(expr -> expr instanceof PyKeywordArgument)
+                .map(expr -> (PyKeywordArgument) expr)
                 // I had a null pointer exception from this previously so probably good to just make sure
-                .filter(expr -> expr.getName() != null)
+                .filter(expr -> expr.getKeyword() != null && expr.getValueExpression() != null)
                 .map(expr -> Pair.create(
-                        ((PyKeywordArgument) expr).getKeyword(), ((PyKeywordArgument) expr).getValueExpression()))
+                        expr.getKeyword(), expr.getValueExpression()))
                 .collect(Collectors.toMap(p -> p.getFirst(), p -> p.getSecond()));
     }
 }

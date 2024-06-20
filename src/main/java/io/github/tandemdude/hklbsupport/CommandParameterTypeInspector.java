@@ -21,7 +21,7 @@ public class CommandParameterTypeInspector extends PyInspection {
     @Override
     public @NotNull PsiElementVisitor buildVisitor(
             @NotNull ProblemsHolder holder, boolean isOnTheFly, @NotNull LocalInspectionToolSession session) {
-        return new CommandRequiredParametersInspector.Visitor(holder, PyInspectionVisitor.getContext(session));
+        return new Visitor(holder, PyInspectionVisitor.getContext(session));
     }
 
     static final class Visitor extends PyInspectionVisitor {

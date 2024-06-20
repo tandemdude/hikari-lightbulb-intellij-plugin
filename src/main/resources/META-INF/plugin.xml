@@ -33,7 +33,6 @@
     <!-- Extension points defined by the plugin.
          Read more: https://plugins.jetbrains.com/docs/intellij/plugin-extension-points.html -->
     <extensions defaultExtensionNs="com.intellij">
-        <postStartupActivity implementation="io.github.tandemdude.hklbsupport.StartupActivity"/>
         <notificationGroup displayType="BALLOON" id="Hikari Lightbulb Support"/>
 
         <completion.contributor
@@ -56,4 +55,11 @@
             groupName="Hikari lightbulb"
         />
     </extensions>
+
+    <projectListeners>
+        <listener
+            class="io.github.tandemdude.hklbsupport.LightbulbPackageManagerListener"
+            topic="com.jetbrains.python.packaging.PyPackageManager$Listener"
+        />
+    </projectListeners>
 </idea-plugin>
