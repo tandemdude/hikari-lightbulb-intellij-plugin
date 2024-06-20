@@ -92,7 +92,7 @@ public class LightbulbPackageManagerListener implements PyPackageManager.Listene
                     }
 
                     sdkLightbulbData.put(sdk, data);
-                    Notifier.notifyInformation(null, "Lightbulb configuration loaded successfully");
+                    Notifier.notifyInformation(null, "Lightbulb configuration loaded successfully (%s)", sdk.getName());
                     return false;
                 }
                 return true;
