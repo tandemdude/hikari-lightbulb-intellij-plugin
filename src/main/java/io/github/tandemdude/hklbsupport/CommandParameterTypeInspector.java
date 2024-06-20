@@ -17,11 +17,10 @@ import com.jetbrains.python.psi.types.PyTypeChecker;
 import com.jetbrains.python.psi.types.PyTypeParser;
 import com.jetbrains.python.psi.types.TypeEvalContext;
 import io.github.tandemdude.hklbsupport.utils.Utils;
-import org.jetbrains.annotations.NotNull;
-
 import java.util.Arrays;
 import java.util.Map;
 import java.util.stream.Collectors;
+import org.jetbrains.annotations.NotNull;
 
 public class CommandParameterTypeInspector extends PyInspection {
     @Override
@@ -57,7 +56,8 @@ public class CommandParameterTypeInspector extends PyInspection {
                     ProblemHighlightType.WARNING);
         }
 
-        void checkParamTypes(@NotNull PyClass node, Map<String, PyExpression> existingParams, Map<String, String> actualParams) {
+        void checkParamTypes(
+                @NotNull PyClass node, Map<String, PyExpression> existingParams, Map<String, String> actualParams) {
             actualParams.forEach((name, type) -> {
                 if (!existingParams.containsKey(name)) {
                     return;
