@@ -5,7 +5,7 @@ import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.module.ModuleManager;
 import com.jetbrains.python.sdk.PythonSdkUtil;
-import io.github.tandemdude.hklbsupport.LightbulbPackageManagerListener;
+import io.github.tandemdude.hklbsupport.ProjectDataService;
 import org.jetbrains.annotations.NotNull;
 
 public class CacheRefreshAction extends AnAction {
@@ -20,14 +20,14 @@ public class CacheRefreshAction extends AnAction {
             return;
         }
 
-        LightbulbPackageManagerListener.flush();
-        var listenerInstance = new LightbulbPackageManagerListener();
+        var dataService = e.getProject().getService(ProjectDataService.class);
+        dataService.flush();
 
         var modules = ModuleManager.getInstance(e.getProject()).getModules();
         for (var module : modules) {
             var sdk = PythonSdkUtil.findPythonSdk(module);
             if (sdk != null) {
-                listenerInstance.packagesChanged(sdk);
+                dataService.notifyChange(sdk);
             }
         }
     }

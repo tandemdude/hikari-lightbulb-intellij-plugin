@@ -7,7 +7,8 @@ import com.jetbrains.python.psi.PyExpression;
 import com.jetbrains.python.psi.PyKeywordArgument;
 import com.jetbrains.python.psi.types.TypeEvalContext;
 import com.jetbrains.python.sdk.PythonSdkUtil;
-import io.github.tandemdude.hklbsupport.LightbulbPackageManagerListener;
+import io.github.tandemdude.hklbsupport.ProjectDataService;
+import io.github.tandemdude.hklbsupport.models.LightbulbData;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -29,9 +30,7 @@ public class Utils {
      * @return the Lightbulb superclass as a {@link PyClass}, or {@code null} if none was found.
      */
     public static @Nullable PyClass getLightbulbSuperclass(
-            @NotNull TypeEvalContext context,
-            @NotNull PyClass pyClass,
-            @NotNull LightbulbPackageManagerListener.LightbulbData moduleData) {
+            @NotNull TypeEvalContext context, @NotNull PyClass pyClass, @NotNull LightbulbData moduleData) {
         PyClass commandSuperClass = null;
         for (var superClass : pyClass.getSuperClasses(context)) {
             if (moduleData.paramData().containsKey(superClass.getQualifiedName())) {
@@ -42,8 +41,7 @@ public class Utils {
         return commandSuperClass;
     }
 
-    public static @Nullable LightbulbPackageManagerListener.LightbulbData getLightbulbDataForNode(
-            @NotNull PyClass node) {
+    public static @Nullable LightbulbData getLightbulbDataForNode(@NotNull PyClass node) {
         var module = ModuleUtilCore.findModuleForFile(node.getContainingFile());
         if (module == null) {
             return null;
@@ -54,7 +52,7 @@ public class Utils {
             return null;
         }
 
-        return LightbulbPackageManagerListener.getDataFor(sdk);
+        return module.getProject().getService(ProjectDataService.class).getLightbulbData(sdk);
     }
 
     public static Map<String, PyExpression> getKeywordSuperclassExpressions(PyClass node) {
