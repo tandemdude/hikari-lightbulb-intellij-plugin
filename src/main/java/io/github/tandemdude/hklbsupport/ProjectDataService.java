@@ -14,7 +14,6 @@ import com.jetbrains.python.sdk.PythonSdkUtil;
 import io.github.tandemdude.hklbsupport.models.LightbulbData;
 import io.github.tandemdude.hklbsupport.models.ParamData;
 import io.github.tandemdude.hklbsupport.utils.Notifier;
-
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
@@ -92,7 +91,8 @@ public final class ProjectDataService {
 
                         var data = readMetaparamsFile(version, file);
                         sdkCache.put(sdk, data);
-                        Notifier.notifyInformation(project, "Lightbulb configuration loaded successfully (%s)", sdk.getName());
+                        Notifier.notifyInformation(
+                                project, "Lightbulb configuration loaded successfully (%s)", sdk.getName());
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
