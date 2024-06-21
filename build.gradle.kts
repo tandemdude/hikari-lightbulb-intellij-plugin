@@ -7,7 +7,7 @@ plugins {
 
 group = "io.github.tandemdude"
 
-version = "0.0.4"
+version = "0.0.5"
 
 repositories { mavenCentral() }
 
