@@ -59,7 +59,18 @@
     <projectListeners>
         <listener
             class="io.github.tandemdude.hklbsupport.LightbulbPackageManagerListener"
-            topic="com.jetbrains.python.packaging.PyPackageManager$Listener"
+            topic="com.jetbrains.python.packaging.common.PythonPackageManagementListener"
         />
     </projectListeners>
+    <actions>
+        <group
+            id="io.github.tandemdude.hklbsupport.ToolsMenuActions"
+            text="Hikari Lightbulb Support"
+            popup="true">
+            <add-to-group group-id="ToolsMenu" anchor="last"/>
+            <action id="io.github.tandemdude.hklbsupport.actions.CacheRefreshAction"
+                    class="io.github.tandemdude.hklbsupport.actions.CacheRefreshAction" text="Refresh Library Cache"
+                    description="Flush and reload the parameter configuration for completions and inspections"/>
+        </group>
+    </actions>
 </idea-plugin>

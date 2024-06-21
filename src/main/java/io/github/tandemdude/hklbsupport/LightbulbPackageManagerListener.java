@@ -11,6 +11,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.search.FileTypeIndex;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.jetbrains.python.packaging.PyPackageManager;
+import com.jetbrains.python.packaging.common.PythonPackageManagementListener;
 import com.jetbrains.python.sdk.PythonSdkUtil;
 import io.github.tandemdude.hklbsupport.utils.Notifier;
 import java.io.IOException;
@@ -20,7 +21,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import org.jetbrains.annotations.NotNull;
 
-public class LightbulbPackageManagerListener implements PyPackageManager.Listener {
+public class LightbulbPackageManagerListener implements PythonPackageManagementListener {
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
     public record ParamData(Map<String, String> required, Map<String, String> optional) {}
@@ -29,8 +30,12 @@ public class LightbulbPackageManagerListener implements PyPackageManager.Listene
 
     private static final ConcurrentHashMap<Sdk, LightbulbData> sdkLightbulbData = new ConcurrentHashMap<>();
 
-    public static ConcurrentHashMap<Sdk, LightbulbData> getSdkLightbulbData() {
-        return sdkLightbulbData;
+    public static LightbulbData getDataFor(Sdk sdk) {
+        return sdkLightbulbData.get(sdk);
+    }
+
+    public static void flush() {
+        sdkLightbulbData.clear();
     }
 
     LightbulbData readMetaparamsFile(String version, VirtualFile vf) {
@@ -43,7 +48,7 @@ public class LightbulbPackageManagerListener implements PyPackageManager.Listene
     }
 
     @Override
-    public void packagesRefreshed(@NotNull Sdk sdk) {
+    public void packagesChanged(@NotNull Sdk sdk) {
         ApplicationManager.getApplication().runReadAction(() -> {
             var packages = PyPackageManager.getInstance(sdk).getPackages();
             if (packages == null) {

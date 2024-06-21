@@ -44,8 +44,7 @@ public class CommandParameterCompletionContributor extends CompletionContributor
                 return;
             }
 
-            var moduleLightbulbData =
-                    LightbulbPackageManagerListener.getSdkLightbulbData().get(sdk);
+            var moduleLightbulbData = LightbulbPackageManagerListener.getDataFor(sdk);
             if (moduleLightbulbData == null) {
                 // We don't have the data for the specified module - maybe it isn't part of this project?
                 // Alternatively, lightbulb may not be installed - a filesystem listener will load the

@@ -17,7 +17,7 @@ intellij {
   version.set("2023.2.6")
   type.set("PC") // Target IDE Platform
 
-  plugins.set(listOf("PythonCore"))
+  plugins.set(listOf("python-ce"))
 }
 
 spotless {
@@ -48,6 +48,11 @@ tasks {
     targetCompatibility = "17"
   }
   withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> { kotlinOptions.jvmTarget = "17" }
+
+  buildSearchableOptions {
+    // Remove if you add plugin settings
+    enabled = false
+  }
 
   patchPluginXml {
     sinceBuild.set("232")

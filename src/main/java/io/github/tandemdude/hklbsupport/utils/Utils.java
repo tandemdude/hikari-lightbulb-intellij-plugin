@@ -54,7 +54,7 @@ public class Utils {
             return null;
         }
 
-        return LightbulbPackageManagerListener.getSdkLightbulbData().get(sdk);
+        return LightbulbPackageManagerListener.getDataFor(sdk);
     }
 
     public static Map<String, PyExpression> getKeywordSuperclassExpressions(PyClass node) {
