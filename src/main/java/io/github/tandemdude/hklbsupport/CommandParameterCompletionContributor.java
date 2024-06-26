@@ -90,16 +90,18 @@ public class CommandParameterCompletionContributor extends CompletionContributor
                 return;
             }
 
+            var existingParameters = Utils.getKeywordSuperclassExpressions(cls);
+
             var completionElements = new ArrayList<LookupElement>();
             var paramData = moduleLightbulbData.paramData().get(commandSuperClass.getQualifiedName());
-            paramData
-                    .required()
-                    .forEach((key, value) -> completionElements.add(
-                            LookupElementBuilder.create(key + "=").withTypeText(value)));
-            paramData
-                    .optional()
-                    .forEach((key, value) -> completionElements.add(
-                            LookupElementBuilder.create(key + "=").withTypeText(value)));
+            paramData.required().entrySet().stream()
+                    .filter(entry -> !existingParameters.containsKey(entry.getKey()))
+                    .forEach(entry -> completionElements.add(
+                            LookupElementBuilder.create(entry.getKey() + "=").withTypeText(entry.getValue())));
+            paramData.optional().entrySet().stream()
+                    .filter(entry -> !existingParameters.containsKey(entry.getKey()))
+                    .forEach(entry -> completionElements.add(
+                            LookupElementBuilder.create(entry.getKey() + "=").withTypeText(entry.getValue())));
 
             result.addAllElements(completionElements);
         }
