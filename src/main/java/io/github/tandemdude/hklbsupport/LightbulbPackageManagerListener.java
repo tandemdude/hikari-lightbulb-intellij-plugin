@@ -33,7 +33,7 @@ public class LightbulbPackageManagerListener implements PythonPackageManagementL
     public void packagesChanged(@NotNull Sdk sdk) {
         ApplicationManager.getApplication().runReadAction(() -> {
             for (var project : ProjectManager.getInstance().getOpenProjects()) {
-                project.getService(ProjectDataService.class).notifyChange(sdk);
+                project.getService(ProjectDataService.class).notifyChange(sdk, false);
             }
         });
     }

@@ -49,7 +49,7 @@ public class CacheRefreshAction extends AnAction {
         for (var module : modules) {
             var sdk = PythonSdkUtil.findPythonSdk(module);
             if (sdk != null) {
-                dataService.notifyChange(sdk);
+                dataService.notifyChange(sdk, true);
             }
         }
     }

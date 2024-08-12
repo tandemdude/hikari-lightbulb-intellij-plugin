@@ -113,10 +113,13 @@ public final class ProjectDataService {
         return false;
     }
 
-    public void notifyChange(Sdk sdk) {
-        FileTypeIndex.processFiles(
+    public void notifyChange(Sdk sdk, boolean triggeredByAction) {
+        var noneFound = FileTypeIndex.processFiles(
                 FileTypeManager.getInstance().getFileTypeByExtension("json"),
                 file -> populateCacheForSdk(sdk, file),
                 GlobalSearchScope.allScope(project));
+        if (noneFound && triggeredByAction) {
+            Notifier.notifyWarning(project, "Failed to load Lightbulb configuration");
+        }
     }
 }
