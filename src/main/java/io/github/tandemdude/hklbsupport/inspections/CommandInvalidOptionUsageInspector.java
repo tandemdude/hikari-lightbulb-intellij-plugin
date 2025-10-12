@@ -1,8 +1,11 @@
 package io.github.tandemdude.hklbsupport.inspections;
 
 import com.intellij.codeInspection.LocalInspectionToolSession;
+import com.intellij.codeInspection.LocalQuickFix;
+import com.intellij.codeInspection.ProblemDescriptor;
 import com.intellij.codeInspection.ProblemHighlightType;
 import com.intellij.codeInspection.ProblemsHolder;
+import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElementVisitor;
 import com.jetbrains.python.inspections.PyInspection;
 import com.jetbrains.python.inspections.PyInspectionVisitor;
@@ -43,24 +46,42 @@ public class CommandInvalidOptionUsageInspector extends PyInspection {
 
             for (var attribute : node.getClassAttributes()) {
                 if (
-                    // if there isn't an assigment statement, or the assigment doesn't include a function call
-                    !(attribute.findAssignedValue() instanceof PyCallExpression callExpr)
-                    // if the function call isn't a reference (this is more just for casting purposes)
-                    || !(callExpr.getCallee() instanceof PyReferenceExpression refExpr)
-                    // if the reference isn't to a function
-                    || !(refExpr.getReference().resolve() instanceof PyFunction func)
-                ) {
+                // if there isn't an assigment statement, or the assigment doesn't include a function call
+                !(attribute.findAssignedValue() instanceof PyCallExpression callExpr)
+                        // if the function call isn't a reference (this is more just for casting purposes)
+                        || !(callExpr.getCallee() instanceof PyReferenceExpression refExpr)
+                        // if the reference isn't to a function
+                        || !(refExpr.getReference().resolve() instanceof PyFunction func)) {
                     continue;
                 }
 
                 // if the referenced function is a built-in lightbulb option function
-                if (lbData.optionFuncs().contains(func.getQualifiedName())) {
+                if (func.getQualifiedName() != null && lbData.optionFuncs().contains(func.getQualifiedName())) {
                     registerProblem(
                             attribute.getParent(),
                             "Options are not permitted for this command type",
-                            ProblemHighlightType.GENERIC_ERROR);
+                            ProblemHighlightType.GENERIC_ERROR,
+                            null,
+                            new RemoveInvalidOptionQuickFix(attribute.getName()));
                 }
             }
+        }
+    }
+
+    record RemoveInvalidOptionQuickFix(String attributeName) implements LocalQuickFix {
+        @Override
+        public @NotNull String getFamilyName() {
+            return "Remove invalid option";
+        }
+
+        @Override
+        public @NotNull String getName() {
+            return "Remove option '" + attributeName + "'";
+        }
+
+        @Override
+        public void applyFix(@NotNull Project project, @NotNull ProblemDescriptor descriptor) {
+            descriptor.getPsiElement().delete();
         }
     }
 }
