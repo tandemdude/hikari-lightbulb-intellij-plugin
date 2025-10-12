@@ -46,7 +46,9 @@ public class LightbulbRegisterCommandDecoratorMacro extends MacroBase {
         for (var assignment : PsiTreeUtil.findChildrenOfType(file, PyAssignmentStatement.class)) {
             var left = assignment.getLeftHandSideExpression();
             var right = assignment.getAssignedValue();
-            if (!(left instanceof PyTargetExpression) || right == null) continue;
+            if (!(left instanceof PyTargetExpression) || right == null) {
+                return null;
+            }
 
             var type = typeContext.getType(right);
             if (type instanceof PyClassType clsType) {
@@ -63,7 +65,7 @@ public class LightbulbRegisterCommandDecoratorMacro extends MacroBase {
 
     @Override
     protected @Nullable Result calculateResult(
-            Expression @NotNull [] expressions, ExpressionContext context, boolean b) {
+            Expression @NotNull [] expressions, ExpressionContext context, boolean quick) {
         var element = context.getPsiElementAtStartOffset();
         if (element == null) {
             return null;

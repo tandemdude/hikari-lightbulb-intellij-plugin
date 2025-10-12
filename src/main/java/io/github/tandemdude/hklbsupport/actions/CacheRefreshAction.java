@@ -28,6 +28,8 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.module.ModuleManager;
 import com.jetbrains.python.sdk.PythonSdkUtil;
 import io.github.tandemdude.hklbsupport.ProjectDataService;
+import java.util.Arrays;
+import java.util.Objects;
 import org.jetbrains.annotations.NotNull;
 
 public class CacheRefreshAction extends AnAction {
@@ -45,13 +47,10 @@ public class CacheRefreshAction extends AnAction {
         var dataService = e.getProject().getService(ProjectDataService.class);
         dataService.flush();
 
-        var modules = ModuleManager.getInstance(e.getProject()).getModules();
-        for (var module : modules) {
-            var sdk = PythonSdkUtil.findPythonSdk(module);
-            if (sdk != null) {
-                dataService.notifyChange(sdk, true);
-            }
-        }
+        Arrays.stream(ModuleManager.getInstance(e.getProject()).getModules())
+                .map(PythonSdkUtil::findPythonSdk)
+                .filter(Objects::nonNull)
+                .forEach(sdk -> dataService.notifyChange(sdk, true));
     }
 
     @Override

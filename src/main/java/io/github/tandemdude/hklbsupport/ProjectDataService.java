@@ -43,6 +43,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
@@ -62,12 +63,10 @@ public final class ProjectDataService {
     }
 
     public void loadModules() {
-        Arrays.stream(ModuleManager.getInstance(project).getModules()).forEach(module -> {
-            var maybeSdk = PythonSdkUtil.findPythonSdk(module);
-            if (maybeSdk != null) {
-                sdkCache.put(maybeSdk, new LightbulbData("-1", Map.of(), List.of()));
-            }
-        });
+        Arrays.stream(ModuleManager.getInstance(project).getModules())
+                .map(PythonSdkUtil::findPythonSdk)
+                .filter(Objects::nonNull)
+                .forEach(sdk -> sdkCache.put(sdk, new LightbulbData("-1", Map.of(), List.of())));
     }
 
     public void flush() {
