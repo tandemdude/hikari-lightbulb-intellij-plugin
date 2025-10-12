@@ -3,9 +3,11 @@ package io.github.tandemdude.hklbsupport.macros;
 import com.intellij.codeInsight.template.Expression;
 import com.intellij.codeInsight.template.ExpressionContext;
 import com.intellij.codeInsight.template.Result;
+import com.intellij.codeInsight.template.TemplateContextType;
 import com.intellij.codeInsight.template.TextResult;
 import com.intellij.codeInsight.template.macro.MacroBase;
 import com.intellij.psi.util.PsiTreeUtil;
+import com.jetbrains.python.codeInsight.liveTemplates.PythonTemplateContextType;
 import com.jetbrains.python.psi.PyAssignmentStatement;
 import com.jetbrains.python.psi.PyClass;
 import com.jetbrains.python.psi.PyFile;
@@ -86,5 +88,10 @@ public class LightbulbRegisterCommandDecoratorMacro extends MacroBase {
         }
 
         return null;
+    }
+
+    @Override
+    public boolean isAcceptableInContext(TemplateContextType context) {
+        return context instanceof PythonTemplateContextType;
     }
 }
