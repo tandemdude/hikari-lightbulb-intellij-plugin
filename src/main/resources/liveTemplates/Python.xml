@@ -1,0 +1,44 @@
+<templateSet group="Hikari-Lightbulb">
+    <template
+        name="slashcmd"
+        value="$decorator$&#10;class Command(&#10;    lightbulb.SlashCommand,&#10;    name=&quot;$name$&quot;,&#10;    description=&quot;$description$&quot;,&#10;):&#10;    @lightbulb.invoke&#10;    async def invoke(self, ctx: lightbulb.Context) -&gt; None:&#10;        ...&#10;"
+        description="Lightbulb slash command boilerplate"
+        toReformat="false"
+        toShortenFQNames="false">
+        <variable name="decorator" defaultValue="lbRegisterCommandDecorator()" alwaysStopAt="false"/>
+        <variable name="name" alwaysStopAt="true"/>
+        <variable name="description" alwaysStopAt="true"/>
+
+        <context>
+            <option name="Python" value="true"/>
+        </context>
+    </template>
+    <template
+            name="messagecmd"
+            value="$decorator$&#10;class Command(&#10;    lightbulb.MessageCommand,&#10;    name=&quot;$name$&quot;,&#10;    description=&quot;$description$&quot;,&#10;):&#10;    @lightbulb.invoke&#10;    async def invoke(self, ctx: lightbulb.Context) -&gt; None:&#10;        ...&#10;"
+            description="Lightbulb message command boilerplate"
+            toReformat="false"
+            toShortenFQNames="false">
+        <variable name="decorator" defaultValue="lbRegisterCommandDecorator()" alwaysStopAt="false"/>
+        <variable name="name" alwaysStopAt="true"/>
+        <variable name="description" alwaysStopAt="true"/>
+
+        <context>
+            <option name="Python" value="true"/>
+        </context>
+    </template>
+    <template
+            name="usercmd"
+            value="$decorator$&#10;class Command(&#10;    lightbulb.UserCommand,&#10;    name=&quot;$name$&quot;,&#10;    description=&quot;$description$&quot;,&#10;):&#10;    @lightbulb.invoke&#10;    async def invoke(self, ctx: lightbulb.Context) -&gt; None:&#10;        ...&#10;"
+            description="Lightbulb user command boilerplate"
+            toReformat="false"
+            toShortenFQNames="false">
+        <variable name="decorator" defaultValue="lbRegisterCommandDecorator()" alwaysStopAt="false"/>
+        <variable name="name" alwaysStopAt="true"/>
+        <variable name="description" alwaysStopAt="true"/>
+
+        <context>
+            <option name="Python" value="true"/>
+        </context>
+    </template>
+</templateSet>

@@ -20,6 +20,7 @@
         <ul>
             <li>Autocompletion of command named parameters</li>
             <li>Type checking of command named parameters</li>
+            <li>Live templates to generate slash (<code>slashcmd</code>), message (<code>messagecmd</code>), and user (<code>usercmd</code>) command boilerplate</li>
         </ul>
         <br>
         Supports hikari-lightbulb major version 3 and later.
@@ -55,6 +56,9 @@
             enabledByDefault="true"
             groupName="Hikari lightbulb"
         />
+
+        <liveTemplateMacro implementation="io.github.tandemdude.hklbsupport.macros.LightbulbRegisterCommandDecoratorMacro"/>
+        <defaultLiveTemplates file="liveTemplates/Python.xml"/>
     </extensions>
 
     <projectListeners>
