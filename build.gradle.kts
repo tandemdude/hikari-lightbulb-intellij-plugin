@@ -1,23 +1,29 @@
 plugins {
   id("java")
-  id("org.jetbrains.kotlin.jvm") version "1.9.23"
-  id("org.jetbrains.intellij") version "1.17.3"
-  id("com.diffplug.spotless") version "6.25.0"
+  id("org.jetbrains.kotlin.jvm") version "2.1.0"
+  id("org.jetbrains.intellij.platform") version "2.9.0"
+  id("com.diffplug.spotless") version "8.0.0"
 }
 
 group = "io.github.tandemdude"
 
 version = "0.0.9"
 
-repositories { mavenCentral() }
+repositories {
+  mavenCentral()
+  intellijPlatform { defaultRepositories() }
+}
 
 // Configure Gradle IntelliJ Plugin
 // Read more: https://plugins.jetbrains.com/docs/intellij/tools-gradle-intellij-plugin.html
-intellij {
-  version.set("2023.2.6")
-  type.set("PC") // Target IDE Platform
+dependencies {
+  intellijPlatform {
+    create("PC", "2025.2.3")
+    testFramework(org.jetbrains.intellij.platform.gradle.TestFrameworkType.Platform)
 
-  plugins.set(listOf("python-ce"))
+    // Add necessary plugin dependencies for compilation here, example:
+    bundledPlugin("com.intellij.modules.python")
+  }
 }
 
 spotless {
@@ -41,29 +47,34 @@ spotless {
   }
 }
 
+intellijPlatform {
+  pluginConfiguration {
+    ideaVersion { sinceBuild = "251" }
+
+    changeNotes =
+      """
+          Initial version
+      """
+        .trimIndent()
+  }
+
+  signing {
+    certificateChain = providers.environmentVariable("CERTIFICATE_CHAIN")
+    privateKey = providers.environmentVariable("PRIVATE_KEY")
+    password = providers.environmentVariable("PRIVATE_KEY_PASSWORD")
+  }
+
+  publishing { token = providers.environmentVariable("PUBLISH_TOKEN") }
+
+  buildSearchableOptions = false
+}
+
 tasks {
   // Set the JVM compatibility versions
   withType<JavaCompile> {
-    sourceCompatibility = "17"
-    targetCompatibility = "17"
+    sourceCompatibility = "21"
+    targetCompatibility = "21"
   }
-  withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> { kotlinOptions.jvmTarget = "17" }
-
-  buildSearchableOptions {
-    // Remove if you add plugin settings
-    enabled = false
-  }
-
-  patchPluginXml {
-    sinceBuild.set("232")
-    untilBuild.set("252.*")
-  }
-
-  signPlugin {
-    certificateChain.set(System.getenv("CERTIFICATE_CHAIN"))
-    privateKey.set(System.getenv("PRIVATE_KEY"))
-    password.set(System.getenv("PRIVATE_KEY_PASSWORD"))
-  }
-
-  publishPlugin { token.set(System.getenv("PUBLISH_TOKEN")) }
 }
+
+kotlin { compilerOptions { jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_21) } }
