@@ -22,6 +22,7 @@
 
 package io.github.tandemdude.hklbsupport.models;
 
+import java.util.List;
 import java.util.Map;
 
-public record LightbulbData(String version, Map<String, ParamData> paramData) {}
+public record LightbulbData(String version, Map<String, ParamData> paramData, List<String> optionFuncs) {}

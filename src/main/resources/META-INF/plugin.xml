@@ -43,14 +43,21 @@
         />
 
         <localInspection
-            implementationClass="io.github.tandemdude.hklbsupport.CommandRequiredParametersInspector"
+                implementationClass="io.github.tandemdude.hklbsupport.inspections.CommandInvalidOptionUsageInspector"
+                language="Python"
+                displayName="Invalid usage of options within commands"
+                enabledByDefault="true"
+                groupName="Hikari Lightbulb"
+        />
+        <localInspection
+            implementationClass="io.github.tandemdude.hklbsupport.inspections.CommandRequiredParametersInspector"
             language="Python"
             displayName="Command missing required parameters"
             enabledByDefault="true"
             groupName="Hikari lightbulb"
         />
         <localInspection
-            implementationClass="io.github.tandemdude.hklbsupport.CommandParameterTypeInspector"
+            implementationClass="io.github.tandemdude.hklbsupport.inspections.CommandParameterTypeInspector"
             language="Python"
             displayName="Command parameters having incorrect type"
             enabledByDefault="true"

@@ -30,17 +30,22 @@ import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.projectRoots.Sdk;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.psi.PsiManager;
 import com.intellij.psi.search.FileTypeIndex;
 import com.intellij.psi.search.GlobalSearchScope;
+import com.jetbrains.python.psi.PyFile;
+import com.jetbrains.python.psi.PyQualifiedNameOwner;
 import com.jetbrains.python.sdk.PythonSdkUtil;
 import io.github.tandemdude.hklbsupport.models.LightbulbData;
 import io.github.tandemdude.hklbsupport.models.ParamData;
 import io.github.tandemdude.hklbsupport.utils.Notifier;
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.Collections;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Service(Service.Level.PROJECT)
@@ -60,7 +65,7 @@ public final class ProjectDataService {
         Arrays.stream(ModuleManager.getInstance(project).getModules()).forEach(module -> {
             var maybeSdk = PythonSdkUtil.findPythonSdk(module);
             if (maybeSdk != null) {
-                sdkCache.put(maybeSdk, new LightbulbData("-1", Collections.emptyMap()));
+                sdkCache.put(maybeSdk, new LightbulbData("-1", Map.of(), List.of()));
             }
         });
     }
@@ -73,9 +78,23 @@ public final class ProjectDataService {
         return sdkCache.get(sdk);
     }
 
-    LightbulbData readMetaparamsFile(String version, VirtualFile vf) throws IOException {
-        var parsedParamData = MAPPER.readValue(vf.getInputStream(), new TypeReference<Map<String, ParamData>>() {});
-        return new LightbulbData(version, parsedParamData);
+    Map<String, ParamData> readMetaparamsFile(VirtualFile vf) {
+        try {
+            return MAPPER.readValue(vf.getInputStream(), new TypeReference<>() {});
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    List<String> readOptionsFile(VirtualFile vf) {
+        var psiFile = PsiManager.getInstance(project).findFile(vf);
+        if (!(psiFile instanceof PyFile pf)) {
+            return List.of();
+        }
+
+        return pf.getTopLevelFunctions().stream()
+                .map(PyQualifiedNameOwner::getQualifiedName)
+                .toList();
     }
 
     boolean populateCacheForSdk(Sdk sdk, VirtualFile paramsFile) {
@@ -89,27 +108,35 @@ public final class ProjectDataService {
             return true;
         }
 
+        Matcher matcher;
         try {
-            var matcher = VERSION_PATTERN.matcher(new String(initFile.contentsToByteArray()));
-            String version = null;
-            while (matcher.find()) {
-                version = matcher.group(1);
-            }
-
-            if (version == null) {
-                return true;
-            }
-
-            if (sdkCache.get(sdk) != null && version.equals(sdkCache.get(sdk).version())) {
-                return false;
-            }
-
-            var data = readMetaparamsFile(version, paramsFile);
-            sdkCache.put(sdk, data);
-            Notifier.notifyInformation(project, "Lightbulb configuration loaded successfully (%s)", sdk.getName());
+            matcher = VERSION_PATTERN.matcher(new String(initFile.contentsToByteArray()));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+
+        String version = null;
+        while (matcher.find()) {
+            version = matcher.group(1);
+        }
+
+        if (version == null) {
+            return true;
+        }
+
+        if (sdkCache.get(sdk) != null && version.equals(sdkCache.get(sdk).version())) {
+            return false;
+        }
+
+        var paramData = readMetaparamsFile(paramsFile);
+        var optionsFuncs = Optional.ofNullable(paramsFile.getParent().findChild("commands"))
+                .map(child -> child.findChild("options.py"))
+                .map(this::readOptionsFile)
+                .orElse(List.of());
+
+        sdkCache.put(sdk, new LightbulbData(version, paramData, optionsFuncs));
+        Notifier.notifyInformation(project, "Lightbulb configuration loaded successfully (%s)", sdk.getName());
+
         return false;
     }
 
